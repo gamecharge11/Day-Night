@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Website</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
+    :root {
+      --gradient: linear-gradient(45deg, #CF5B05, #ff913d, #FE9400);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Roboto', sans-serif;
+      font-size: 1.07em;
+    }
+
+    body {
+      overflow: hidden;
+    }
+
+    canvas {
+      position: absolute;
+      z-index: -1;
+      background-color: black;
+    }
+
+    .bg {
+      background: var(--gradient);
+    }
+
+    .sliders {
+      z-index: 1;
+      width: fit-content;
+      height: fit-content;
+      padding-top: 20px;
+      padding-bottom: 20px;
+      padding-left: 30px;
+      padding-right: 30px;
+      background-color: black;
+      color: white;
+      border-radius: 15px;
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      border: 3px solid white;
+    }
+
+    .title {
+      padding-bottom: 10px;
+      font-size: 1.15em;
+      text-align: center;
+    }
+
+    .center {
+      width: 100vw;
+      height: 100vh;
+      color: white;
+      font-size: 6em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .center h1 {
+      font-weight: lighter;
+      padding-bottom: 100px;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas class="bg"></canvas>
+  <div class="center">
+    <h1 id="text">Rise and Shine!</h1>
+  </div>
+  <script>
+    const canvas = document.querySelector("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth + 100;
+    canvas.height = window.innerHeight;
+
+    var clrA = '#ffbb00'
+    var clrB = '#ffd359'
+    var shadowColor = 'yellow';
+    var stroke = 'rgb(33, 137, 255)';
+    var running = false;
+
+    ctx.beginPath();
+    var speed = 0.1,
+      increment = 0.05,
+      sunX = canvas.width - 300,
+      sunY = 200,
+      moonX = canvas.width - 300,
+      moonY = 200,
+      inc = 1
+
+    var status = true
+
+    function toNight() {
+      running = true
+      var interval = setInterval(function () {
+        sunX -= 10
+        if (sunX <= canvas.width / 3) {
+          sunY += 1.5
+        } else if (sunX <= canvas.width / 2) {
+          sunY += 0
+        } else {
+          sunY -= 1.5
+        }
+        if (sunX <= -150) {
+          clearInterval(interval);
+          canvas.classList = "none"
+          var moonInterval = setInterval(function () {
+            sunX -= 10
+            if (moonX <= canvas.width - 300) {
+              clearInterval(moonInterval);
+              sunX = canvas.width - 300
+              clrA = "white"
+              clrB = "white"
+              shadowColor = "white"
+              document.getElementById("text").innerHTML = "Sweet Dreams!"
+              stroke = '#186ac7'
+              running = false
+            }
+          }, 16)
+        }
+      }, 16)
+    }
+
+    function toDay() {
+      var interval = setInterval(function () {
+        running = true
+        sunX -= 10;
+        if (sunX <= canvas.width / 3) {
+          sunY += 1.5
+        } else if (sunX <= canvas.width / 2) {
+          sunY += 0
+        } else {
+          sunY -= 1.5
+        }
+        if (sunX <= -150) {
+          clearInterval(interval);
+          location.reload()
+          running = false
+        }
+      }, 16)
+    }
+
+    function plot() {
+      canvas.width = canvas.width;
+      ctx.strokeStyle = stroke
+      for (let x = 0; x < canvas.width + 100; x++) {
+        const yOffset = canvas.height - 10;
+        ctx.lineWidth = 300;
+        // Sine Wave below. format = sin(x / waveLength) * amplitude WHERE x = x value of current drawing pixel
+        ctx.lineTo(x - 100, yOffset + Math.sin(x / 300 + speed) * 30);
+      }
+      ctx.stroke();
+      speed += increment;
+      ctx.beginPath();
+      ctx.lineWidth = 3
+      ctx.shadowColor = shadowColor
+      ctx.shadowBlur = 100
+      var grd = ctx.createRadialGradient(75, 50, 5, 90, 60, 100);
+      grd.addColorStop(0, clrA)
+      grd.addColorStop(1, clrB)
+      ctx.fillStyle = grd
+      ctx.arc(sunX, sunY, 75, 0, 2 * Math.PI);
+      ctx.fill();
+
+      requestAnimationFrame(plot);
+    }
+    window.addEventListener('click', function () {
+      if (!running) {
+        inc++
+        if (inc % 2 == 0) {
+          toNight()
+        } else {
+          toDay()
+        }
+      }
+    })
+    requestAnimationFrame(plot);
+  </script>
+</body>
+
+</html>
